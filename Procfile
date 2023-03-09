@@ -1,1 +1,1 @@
-web: gunicorn -b :$PORT main:app
+web: uvicorn main:app --port ${PORT}
