@@ -10,3 +10,4 @@ fastapi-limiter
 cloudinary
 sqlalchemy
 pydantic[dotenv]
+uvicorn
