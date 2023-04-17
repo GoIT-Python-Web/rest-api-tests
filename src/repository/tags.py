@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
 from src.database.models import Tag, User
-from src.shemas import TagModel
+from src.schemas import TagModel
 
 
 async def get_tags(skip: int, limit: int, user: User, db: Session) -> List[Tag]:
@@ -61,7 +61,9 @@ async def create_tag(body: TagModel, user: User, db: Session) -> Tag:
     return tag
 
 
-async def update_tag(tag_id: int, body: TagModel, user: User, db: Session) -> Tag | None:
+async def update_tag(
+    tag_id: int, body: TagModel, user: User, db: Session
+) -> Tag | None:
     """
     Update an existing tag that belongs to a user.
 
@@ -78,7 +80,7 @@ async def update_tag(tag_id: int, body: TagModel, user: User, db: Session) -> Ta
     """
     tag = db.query(Tag).filter(and_(Tag.id == tag_id, Tag.user_id == user.id)).first()
     if tag:
-        tag .name = body.name
+        tag.name = body.name
         db.commit()
     return tag
 

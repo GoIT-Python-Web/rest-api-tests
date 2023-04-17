@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from src.database.models import Note, Tag, User
-from src.shemas import NoteModel, NoteUpdate, NoteStatusUpdate
+from src.schemas import NoteModel, NoteUpdate, NoteStatusUpdate
 
 
 async def get_notes(skip: int, limit: int, user: User, db: Session) -> List[Note]:
@@ -22,7 +22,9 @@ async def get_notes(skip: int, limit: int, user: User, db: Session) -> List[Note
     :return: A list of notes.
     :rtype: List[Note]
     """
-    return db.query(Note).filter(Note.user_id == user.id).offset(skip).limit(limit).all()
+    return (
+        db.query(Note).filter(Note.user_id == user.id).offset(skip).limit(limit).all()
+    )
 
 
 async def get_note(note_id: int, user: User, db: Session) -> Note:
@@ -38,7 +40,9 @@ async def get_note(note_id: int, user: User, db: Session) -> Note:
     :return: The note with the specified ID, or None if it does not exist.
     :rtype: Note | None
     """
-    return db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    return (
+        db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    )
 
 
 async def create_note(body: NoteModel, user: User, db: Session) -> Note:
@@ -54,7 +58,9 @@ async def create_note(body: NoteModel, user: User, db: Session) -> Note:
     :return: The newly created note.
     :rtype: Note
     """
-    tags = db.query(Tag).filter(and_(Tag.id.in_(body.tags), Tag.user_id == user.id)).all()
+    tags = (
+        db.query(Tag).filter(and_(Tag.id.in_(body.tags), Tag.user_id == user.id)).all()
+    )
     note = Note(title=body.title, description=body.description, tags=tags, user=user)
     db.add(note)
     db.commit()
@@ -75,14 +81,18 @@ async def remove_note(note_id: int, user: User, db: Session) -> Note | None:
     :return: The removed note, or None if it does not exist.
     :rtype: Note | None
     """
-    note = db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    note = (
+        db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    )
     if note:
         db.delete(note)
         db.commit()
     return note
 
 
-async def update_note(note_id: int, body: NoteUpdate, user: User, db: Session) -> Note | None:
+async def update_note(
+    note_id: int, body: NoteUpdate, user: User, db: Session
+) -> Note | None:
     """
     Updates a single note with the specified ID for a specific user.
 
@@ -97,9 +107,15 @@ async def update_note(note_id: int, body: NoteUpdate, user: User, db: Session) -
     :return: The updated note, or None if it does not exist.
     :rtype: Note | None
     """
-    note = db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    note = (
+        db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    )
     if note:
-        tags = db.query(Tag).filter(and_(Tag.id.in_(body.tags), Note.user_id == user.id)).all()
+        tags = (
+            db.query(Tag)
+            .filter(and_(Tag.id.in_(body.tags), Note.user_id == user.id))
+            .all()
+        )
         note.title = body.title
         note.description = body.description
         note.done = body.done
@@ -108,7 +124,9 @@ async def update_note(note_id: int, body: NoteUpdate, user: User, db: Session) -
     return note
 
 
-async def update_status_note(note_id: int, body: NoteStatusUpdate, user: User, db: Session) -> Note | None:
+async def update_status_note(
+    note_id: int, body: NoteStatusUpdate, user: User, db: Session
+) -> Note | None:
     """
     Updates the status (i.e. "done" or "not done") of a single note with the specified ID for a specific user.
 
@@ -123,7 +141,9 @@ async def update_status_note(note_id: int, body: NoteStatusUpdate, user: User, d
     :return: The updated note, or None if it does not exist.
     :rtype: Note | None
     """
-    note = db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    note = (
+        db.query(Note).filter(and_(Note.id == note_id, Note.user_id == user.id)).first()
+    )
     if note:
         note.done = body.done
         db.commit()

@@ -2,7 +2,7 @@ from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
 from src.database.models import User
-from src.shemas import UserModel
+from src.schemas import UserModel
 
 
 async def get_user_by_email(email: str, db: Session) -> User:

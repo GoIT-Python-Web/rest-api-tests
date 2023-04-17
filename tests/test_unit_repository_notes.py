@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from sqlalchemy.orm import Session
 
 from src.database.models import Note, Tag, User
-from src.shemas import NoteModel, NoteUpdate, NoteStatusUpdate
+from src.schemas import NoteModel, NoteUpdate, NoteStatusUpdate
 from src.repository.notes import (
     get_notes,
     get_note,
@@ -16,7 +16,6 @@ from src.repository.notes import (
 
 
 class TestNotes(unittest.IsolatedAsyncioTestCase):
-
     def setUp(self):
         self.session = MagicMock(spec=Session)
         self.user = User(id=1)
@@ -66,14 +65,18 @@ class TestNotes(unittest.IsolatedAsyncioTestCase):
         self.session.query().filter().first.return_value = note
         self.session.query().filter().all.return_value = tags
         self.session.commit.return_value = None
-        result = await update_note(note_id=1, body=body, user=self.user, db=self.session)
+        result = await update_note(
+            note_id=1, body=body, user=self.user, db=self.session
+        )
         self.assertEqual(result, note)
 
     async def test_update_note_not_found(self):
         body = NoteUpdate(title="test", description="test note", tags=[1, 2], done=True)
         self.session.query().filter().first.return_value = None
         self.session.commit.return_value = None
-        result = await update_note(note_id=1, body=body, user=self.user, db=self.session)
+        result = await update_note(
+            note_id=1, body=body, user=self.user, db=self.session
+        )
         self.assertIsNone(result)
 
     async def test_update_status_note_found(self):
@@ -81,16 +84,20 @@ class TestNotes(unittest.IsolatedAsyncioTestCase):
         note = Note()
         self.session.query().filter().first.return_value = note
         self.session.commit.return_value = None
-        result = await update_status_note(note_id=1, body=body, user=self.user, db=self.session)
+        result = await update_status_note(
+            note_id=1, body=body, user=self.user, db=self.session
+        )
         self.assertEqual(result, note)
 
     async def test_update_status_note_not_found(self):
         body = NoteStatusUpdate(done=True)
         self.session.query().filter().first.return_value = None
         self.session.commit.return_value = None
-        result = await update_status_note(note_id=1, body=body, user=self.user, db=self.session)
+        result = await update_status_note(
+            note_id=1, body=body, user=self.user, db=self.session
+        )
         self.assertIsNone(result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
